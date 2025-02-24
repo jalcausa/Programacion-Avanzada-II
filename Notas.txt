@@ -1,0 +1,15 @@
+PROGRAMMING IN SCALA - FIFTH EDITION
+
+CHAPTER 1
+
+-Lo que convierte a Scala en un lenguaje escalable es la combinación de su orientación a objetos y la programación funcional
+-En Scala el concepto de objeto y de función es el mismo. En escala el valor de una función es un objeto. Los tipos de función son clases que pueden ser heredadas por subclases.
+-Los traits en Scala son como las interfaces en Java pero pueden tener implementaciones de métodos e incluso campos.
+
+Programación funcional: dos principios:
+1) Las funciones son valores de primera clase. Es decir una función es un valor igual que un entero o un String. Se pueden pasar como argumentos funciones, devolverlas como resultado de otra función y declarar funciones dentro de funciones igual que se hace con enteros por ejemplo.
+2) Las operaciones de un programa debería mapear valores de entrada a valores de salida en lugar de modificar los datos directamente.
+
+-Function literal: 
+val nameHasUpperCase = name.exists(_.isUpper)
+_.isUpper describe a una función que toma como argumento un carácter, representado por _ y comprueba si es mayúscula
