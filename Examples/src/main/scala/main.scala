@@ -29,5 +29,10 @@ def main(): Unit =
   Por defecto, el compilador de Scala produce una clase con dos variables de instancia
   privadas y un constructor por defecto que toma como argumento ambas.
   La única diferencia es que las variables de instancia generadas en Scala serán final
-  
+
+  En Java cuando creamos un nuevo objeto hay que escribir su tipo dos veces:
+  val x: HashMap[Int, String] = new HashMap[Int, String]()
+  En Scala eso no es necesario. Cualquiera de las dos siguientes alternativas es válida:
+  val x = new HashMap[Int, String]()
+  val x: Map[Int, String] = new HashMap()
   */
