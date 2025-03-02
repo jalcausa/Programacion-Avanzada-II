@@ -19,3 +19,6 @@ _.isUpper describe a una función que toma como argumento un carácter, represen
 -Permite parametrizar tipos usando genéricos, combinar tipos usando intersecciones y ocultar detalles de los tipos usando tipos abstractos.
 
 -Si aprendes Scala desde Java, lo más difícil puede ser su sistema de tipado y el soporte para programación funcional.
+
+CHAPTER 2
+
