@@ -36,3 +36,12 @@ def maximoMinimo(n1:Int,n2:Int): (Int,Int) =
   val MCD = euclides(n1, n2)
   val mcm = Math.abs(n1 * n2) / MCD
   (MCD, mcm)
+
+/*
+4) Implementa una función que encuentre el segundo elemento más grande de una lista.
+Nota: Utilizar las funciones de la librería de la clase List.
+*/
+
+def segundoElemento(l:List[Int]):Int =
+  val listaSinMax = l.filter(_ != l.max)
+  listaSinMax.max
