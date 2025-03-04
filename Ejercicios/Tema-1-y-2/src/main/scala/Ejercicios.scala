@@ -45,3 +45,31 @@ Nota: Utilizar las funciones de la librería de la clase List.
 def segundoElemento(l:List[Int]):Int =
   val listaSinMax = l.filter(_ != l.max)
   listaSinMax.max
+
+
+/*
+5) Escribe un programa que elimine todos los duplicados de una lista
+(sin usar funciones predefinidas como distinct).
+*/
+def eliminaDuplicados(l:List[Int]): List[Int] =
+  def bucle(original: List[Int], visitados: Set[Int]): List[Int] = original match
+    case Nil => Nil
+    case head :: tail if visitados.contains(head) => bucle(tail, visitados)
+    case head :: tail => head::bucle(tail, visitados + head)
+  bucle(l, Set.empty)
+
+/*
+6) Implementa una función que gire una lista k posiciones a la derecha (por ejemplo, [1, 2, 3, 4, 5]
+rotado en 2 se convierte en [4, 5, 1, 2, 3])
+*/
+
+// Versión recursiva de cola, hay otra forma más sencilla de hacerlo
+// usando recursión normal y las funciones de listas last e init
+def gira(l:List[Int],k:Int):List[Int] =
+  def aux (i: Int, rest: List[Int], acc: List[Int]): List[Int] =
+    if (i == 0)  rest ++ acc.reverse
+    else
+      rest match
+        case Nil => Nil
+        case head :: tail => aux(i - 1, tail, head::acc)
+  aux(l.length-k, l, Nil)
