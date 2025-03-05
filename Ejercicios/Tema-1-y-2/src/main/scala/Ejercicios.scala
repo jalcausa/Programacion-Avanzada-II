@@ -1,3 +1,5 @@
+import scala.annotation.tailrec
+
 /*
 1) Implementa una función que compruebe si una cadena dada es un palíndromo
 (ignorando mayúsculas y minúsculas y espacios).
@@ -73,3 +75,16 @@ def gira(l:List[Int],k:Int):List[Int] =
         case Nil => Nil
         case head :: tail => aux(i - 1, tail, head::acc)
   aux(l.length-k, l, Nil)
+
+/*
+7) Implementa un programa que compruebe si dos listas son permutaciones entre sí, sin ordenar las listas.
+*/
+
+def esPermutacion(l1: List[Int], l2: List[Int]): Boolean = {
+  if (l1.length != l2.length) return false
+  def contarElementos(lista: List[Int]): Map[Int, Int] = {
+    lista.foldLeft(Map[Int, Int]()) {(contador, elemento) =>
+      contador + (elemento -> (contador.getOrElse(elemento, 0) + 1))}
+  }
+  contarElementos(l1) == contarElementos(l2)
+}

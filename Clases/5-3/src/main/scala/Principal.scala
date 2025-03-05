@@ -61,8 +61,19 @@ object Lista:
 // Para invertir una lista:
 // foldLeft[Int, Lista[Int]](Lista(1,2,3), Nula, Cons(_,_))
 
-def cadenas(n: Int): List[String] =
+// Solución no recursiva de cola:
+def cadenasNRC(n: Int): List[String] =
   def bucle(n: Int, acc: String, listaCadena: List[String]): List[String] =
     if (n == 0) acc::listaCadena
     else bucle(n - 1, acc + "1", listaCadena) ::: bucle(n-1, acc + "0", listaCadena)
   bucle(n, "", Nil)
+
+// Solución recursiva de cola:
+def cadenasBinaria(n: Int): List[String] =
+  def incrementa(l: List[String]): List[String] =
+    l.map[String](_ + "0") ++ l.map[String](_ + "1")
+  @annotation.tailrec
+  def bucle(m: Int, acc: List[String]): List[String] =
+    if (m == n) acc
+    else bucle(m + 1, incrementa(acc))
+  bucle(0, List(""))
