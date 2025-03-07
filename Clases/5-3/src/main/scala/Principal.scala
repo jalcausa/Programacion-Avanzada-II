@@ -47,6 +47,7 @@ object Lista:
     case Cons(a, r) => f(a, foldRight(r, inic, f))
 
   def foldLeft[A, B](l: Lista[A], inic: B, f: (B, A) => B): B =
+    @annotation.tailrec
     def bucle(l: Lista[A], acc: B): B = l match
       case Nula => acc
       case Cons(a, r) => bucle(r, f(acc, a))
