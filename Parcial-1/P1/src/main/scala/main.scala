@@ -124,3 +124,67 @@ def groupBy[A, B](lista: List[A], f: A => B): Map[B, List[A]] =
       case Nil => res
       case x::xs => bucle(xs, res.updated(f(x), x::res.getOrElse(f(x), Nil)))
   bucle(lista, Map())
+
+/*
+  8) Implementa una operación reduce(l, f) que toma como argumentos una lista l de elementos de tipo
+  A y una función f de tipo (A, A) => A y que devuelva el resultado de combinar todos los elementos
+  de l utilizando la función f. Por ejemplo:
+  println(reduce(List(1,2,3,4,5), _ + _)) // Output: 15
+*/
+
+def reduce[A](lista: List[A], f: (A, A) => A): A =
+  @tailrec
+  def aux(lista: List[A], acc: A): A =
+    lista match
+      case Nil => acc
+      case x::xs => aux(xs, f(acc, x))
+  aux(lista.tail, lista.head)
+
+/*
+  9) Implementa una función recursiva para generar todos los subconjuntos de un conjunto
+  determinado. Conviértela en recursiva de cola.
+    println(subsets(Set())) // Output: Set(Set())
+    println(subsets(Set(1))) // Output: Set(Set(), Set(1))
+    println(subsets(Set(1,2))) // Output: Set(Set(),Set(1),Set(2),Set(1,2))
+    println(subsets(Set(1, 2, 3)))
+  // Output: Set(Set(),Set(1),Set(2),Set(1,2),Set(3),Set(1,3),Set(2,3),Set(1,2,3))
+*/
+
+def subsets[A](s: Set[A]): Set[Set[A]] =
+  def aux(s: Set[A], res: Set[Set[A]]): Set[Set[A]]=
+    if (s.isEmpty) res
+    else {
+      val rest = res.map(_ + s.head)
+      aux(s.tail, res ++ rest)
+    }
+  aux(s, Set(Set()))
+
+/*
+  10) Escribe una función recursiva de cola generateParentheses(n: Int): List[String] que
+  genere todas las combinaciones válidas de n pares de paréntesis. Ejemplos:
+  println(generateParentheses(3))
+  // Output: Lista("((()))", "((())", "(())", "((())", "()()()")
+  Consejos:
+  • Utiliza un acumulador para almacenar secuencias válidas.
+  • Haz un seguimiento del número de paréntesis de apertura (open) y cierre (closed) utilizados.
+  • Caso base: Cuando open == closed == n, agrega la secuencia al resultado.
+ */
+
+def generateParentheses(n: Int): List[String] =
+  @tailrec
+  def generate(open: Int, close: Int, acc: List[String], stack:
+    List[(String, Int, Int)]): List[String] = {
+      stack match {
+        case Nil => acc // Base case: no more states to process
+        case (current, openLeft, closeLeft) :: rest =>
+          if (openLeft == 0 && closeLeft == 0)
+            generate(open, close, current :: acc, rest) // Valid sequence found, add to accumulator
+          else {
+            val newStack =
+            (if (openLeft > 0) (current + "(", openLeft - 1, closeLeft) :: rest else rest) :::
+            (if (closeLeft > openLeft) (current + ")", openLeft, closeLeft - 1) :: rest else rest)
+            generate (open, close, acc, newStack)
+          }
+      }
+    }
+  generate(n, n, List(), List(("", n, n)))
