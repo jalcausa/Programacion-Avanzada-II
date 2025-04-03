@@ -1,4 +1,4 @@
-package practica_22
+package practica_2
 
 trait ImmutableQueue[T] {
   def enqueue(elem: T): ImmutableQueue[T]
@@ -6,36 +6,30 @@ trait ImmutableQueue[T] {
   def isEmpty: Boolean
 }
 
-/*
-  -El private después del nombre de la clase indica que el constructor primario (el que crearía
-  un nuevo SimpleQueue a partir de una Lista es privado y solo se puede usar dentro de la propia
-  clase.
-  -El constructor que aparece abajo es un constructor auxiliar (que sí es público y permite crear
-  una nueva SimpleQueue a partir de un número variable de elementos en vez de una lista.
-  -Al poner private val elems estamos diciendo que elems es un atributo de instancia de la clase
-  y además que es accesible solo desde dentro de ella (por ser private).  Si no pusieramos val
-  entonces elems solo sería un parámetro del constructor y NO un atributo de clase, esa es la
-  diferencia clave.
-**/
 class SimpleQueue[T] private (private val elems: List[T]) extends ImmutableQueue[T] {
   def this(selems: T*) =
     this(selems.toList)
-  
-  def enqueue(elem: T): ImmutableQueue[T] = {
-    new SimpleQueue(elems++List(elem))
-  }
+
+  def enqueue(elem: T): ImmutableQueue[T] =
+    new SimpleQueue(elems ++ List(elem))
 
   def dequeue(): (T, ImmutableQueue[T]) =
     (elems.head, new SimpleQueue(elems.tail))
-  
-  def isEmpty: Boolean = elems.isEmpty
-  
+
+  def isEmpty: Boolean =
+    elems.isEmpty
+
   override def toString: String =
     elems.mkString("Queue(", ", ", ")")
+
+  // Aquí se usa el match para diferencia el tipo de un dato al tener varias posibilidades
+  // Cuando se realiza el match, Scala crea una copia del objeto al que se hace referencia en that
+  // Por eso podemos acceder al atributo elems de that  
   override def equals(obj: Any): Boolean =
     obj match
       case that: SimpleQueue[_] => this.elems == that.elems
-      case _ => false  
+      case _ => false
+      
   override def hashCode(): Int =
     elems.hashCode()
 }
