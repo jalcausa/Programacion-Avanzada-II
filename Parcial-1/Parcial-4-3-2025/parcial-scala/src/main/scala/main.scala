@@ -7,7 +7,8 @@ trait ImmutableVector {
 
 class MiVector private (private val elems: List[Double]) extends ImmutableVector {
 
-  def this(values: Double*) = this(values.toList)
+  def this(values: Double*) =
+    this(values.toList)
 
   override def toList: List[Double] = elems
   override def dim: Int = elems.length
@@ -65,7 +66,15 @@ def mergeSort[A](lq: (A, A) => Boolean)(lista: List[A]): List[A] = {
   }
 }
 
-def powerset[A](list: List[A]): List[List[A]] = list match {
+// Version recursiva de cola de powerset:
+def powerset[A](lista: List[A]): List[List[A]] =
+  @tailrec
+  def bucle(rest: List[A], acc: List[List[A]]): List[List[A]] = rest match
+    case Nil => acc
+    case x::xs => bucle(xs, acc ++ acc.map(l => x::l))
+  bucle(lista, List(List()))
+
+def powerset2[A](list: List[A]): List[List[A]] = list match {
   case Nil => List(Nil)
   case head :: tail =>
     val tailSubsets = powerset(tail)
@@ -73,7 +82,7 @@ def powerset[A](list: List[A]): List[List[A]] = list match {
 }
 
 def knapsack(n: Int, list: List[Int]): Option[List[Int]] = {
-  powerset(list).find(sublist => sublist.sum == n)
+  powerset2(list).find(sublist => sublist.sum == n)
 }
 
 
