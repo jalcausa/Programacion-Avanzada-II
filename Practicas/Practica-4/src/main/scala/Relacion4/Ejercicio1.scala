@@ -1,3 +1,6 @@
+package Relacion4
+
+
 /*
 Ejercicio 1 a)
 class Hebra(t: Int, c: Char) extends Thread{
