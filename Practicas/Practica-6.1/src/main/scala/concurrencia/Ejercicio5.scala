@@ -9,25 +9,61 @@ object gestorAgua {
   // CS-Ox1: El oxígeno que quiere formar una molécula espera si ya hay un oxígeno
   // CS-Ox2: El oxígeno debe esperar a los otros dos átomos para formar la molécula
 
+  private var nOxigeno = 0
+  private var nHidrogeno = 0
+
+  private val mutex = new Semaphore(1)
+  private val puertaHid = new Semaphore(1)
+  private val puertaOx = new Semaphore(1)
+  private val molecula = new Semaphore(0)
 
   def oxigeno(id: Int) = {
     // el oxígeno id quiere formar una molécula
-    // ...
+    // el hidrógeno id quiere formar una molécula
+    puertaOx.acquire()
+    mutex.acquire()
     log(s"Oxígeno $id quiere formar una molécula")
-    // ...
-    // log(s"      Molécula formada!!!")
-    // ...
+    nOxigeno += 1
+    if (nHidrogeno + nOxigeno < 3) {
+      mutex.release()
+      molecula.acquire()
+      mutex.acquire()
+    } else
+      log(s"      Molécula formada!!!")
+    nOxigeno -= 1
+    if (nHidrogeno + nOxigeno > 0)
+      molecula.release()
+    else {
+      puertaHid.release()
+      puertaOx.release()
+    }
+    mutex.release()
     // log(s"Sale oxígeno $id: numO: $numO---molecula=${molecula.availablePermits()}")
     // ...
   }
 
   def hidrogeno(id: Int) = {
     // el hidrógeno id quiere formar una molécula
-    // ...
+    puertaHid.acquire()
+    mutex.acquire()
     log(s"Hidrógeno $id quiere formar una molécula")
-    // ...
-    // log(s"      Molécula formada!!!")
-    // ...
+    nHidrogeno += 1
+    if (nHidrogeno == 1)
+      puertaHid.release()
+    if (nHidrogeno + nOxigeno < 3) {
+      mutex.release()
+      molecula.acquire()
+      mutex.acquire()
+    } else
+      log(s"      Molécula formada!!!")
+    nHidrogeno -= 1
+    if (nHidrogeno + nOxigeno > 0)
+      molecula.release()
+    else {
+      puertaHid.release()
+      puertaOx.release()
+    }
+    mutex.release()
   }
 }
 object Ejercicio5 {
