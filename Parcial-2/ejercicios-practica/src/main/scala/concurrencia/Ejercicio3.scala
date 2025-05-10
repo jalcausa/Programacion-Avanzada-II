@@ -3,31 +3,38 @@ package concurrencia
 import java.util.concurrent.*
 import scala.util.Random
 object aseo{
-  // CS-Cliente: Esperan si está el Equipo de Limpieza en el aseo
-  // CS-EquipoLimpieza: Espera si hay clientes en el aseo
 
-  // ...
   private var numClientes = 0
+  private val mutex = new Semaphore(1)
+  private val limpiando = new Semaphore(1)
 
   def entraCliente(id:Int)={
-    // ...
+    mutex.acquire()
+    numClientes += 1
+    // Si soy el primer cliente hago un acquire a limpiando
+    if (numClientes == 1)
+      limpiando.acquire()
     log(s"Entra cliente $id. Hay $numClientes clientes.")
-    // ...
+    mutex.release()
   }
   def saleCliente(id:Int)={
-    // ...
+    mutex.acquire()
+    numClientes -= 1
     log(s"Sale cliente $id. Hay $numClientes clientes.")
-    // ...
+    if (numClientes == 0) {
+      // Haciendo el release aquí doy una oportunidad al equipoLimpieza de entrar si quiere,
+      // si no le hará el acquire el siguiente cliente que llegue
+      limpiando.release()
+    }
+    mutex.release()
   }
   def entraEquipoLimpieza ={
-    // ...
+    limpiando.acquire()
     log(s"        Entra el equipo de limpieza.")
-    // ...
   }
   def saleEquipoLimpieza = {
-    // ...
     log(s"        Sale el equipo de limpieza.")
-    // ...
+    limpiando.release()
   }
 }
 

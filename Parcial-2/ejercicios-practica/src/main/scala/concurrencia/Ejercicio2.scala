@@ -12,22 +12,30 @@ class Cadena(n: Int) {
   for (i <- esperaEmpaquetador.indices)
     esperaEmpaquetador(i) = new Semaphore(0)
 
+  // Empaquetadores
   def retirarProducto(p: Int) = {
     esperaEmpaquetador(p).acquire()
     mutex.acquire()
     tipo(p) -= 1
     log(s"Empaquetador $p retira un producto. Quedan ${tipo.mkString("[",",","]")}")
+    cuentaTotal += 1
+    log(s"Total de productos empaquetados $cuentaTotal")
+    if (tipo.sum == n-1)
+      esperaColocador.release()
+    if (tipo(p) > 0)
+      esperaEmpaquetador(p).release()
     mutex.release()
-    esperaColocador.release()
   }
+  // Colocador
   def nuevoProducto(p:Int) = {
     esperaColocador.acquire()
     mutex.acquire()
     tipo(p) += 1
-    cuentaTotal += 1
     log(s"Colocador pone un producto $p. Quedan ${tipo.mkString("[",",","]")}")
-    log(s"Total de productos empaquetados $cuentaTotal")
-    esperaEmpaquetador(p).release()
+    if (tipo(p) == 1)
+      esperaEmpaquetador(p).release()
+    if (tipo.sum < n) // si queda espacio me dejo a mí mismo añadir otro producto
+      esperaColocador.release()
     mutex.release()
   }
 }
