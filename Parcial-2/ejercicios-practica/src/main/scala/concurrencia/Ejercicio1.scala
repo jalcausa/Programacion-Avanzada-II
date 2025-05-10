@@ -4,28 +4,36 @@ import java.util.concurrent.*
 import scala.util.Random
 
 object mediciones {
-  // CS-Sensor-i: sensor i no puede volver a medir hasta que el trabajador no ha
-  // terminado de procesar las medidas anteriores
-  // CS-Trabajador: no puede realizar su tarea hasta que no están las
-  // tres mediciones
 
+  var nMediciones = 0
+  private val mutex = new Semaphore(1)
+  private val esperaTrabajador = new Semaphore(0)
+  private val esperaSensor = new Array[Semaphore](3)
+  for (i <- esperaSensor.indices)
+    esperaSensor(i) = new Semaphore(1)
 
   def nuevaMedicion(id: Int) = {
-    // ...
+    esperaSensor(id).acquire()
+    mutex.acquire()
+    nMediciones += 1
     log(s"Sensor $id almacena su medición" )
-    // ...
+    if (nMediciones == esperaSensor.length)
+      esperaTrabajador.release()
+    mutex.release()
   }
 
   def leerMediciones() = {
-    // ...
+    esperaTrabajador.acquire()
     log(s"El trabajador recoge las mediciones")
-    // ...
   }
 
   def finTarea() = {
-    // ...
+    mutex.acquire()
+    nMediciones = 0
+    mutex.release()
     log(s"El trabajador ha terminado sus tareas")
-    // ...
+    for (i <- esperaSensor.indices)
+      esperaSensor(i).release()
   }
 }
 
