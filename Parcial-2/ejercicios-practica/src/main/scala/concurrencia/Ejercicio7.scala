@@ -10,14 +10,14 @@ class Nido(B: Int) {
   private var plato = 0
   // ...
 
-  def cojoBichito(i: Int) = {
+  def cojoBichito(i: Int): Unit = {
     // el bebé i coge un bichito del plato
     // ...
     log(s"Bebé $i coge un bichito. Quedan $plato bichitos")
     // ...
   }
 
-  def pongoBichito(i: Int) = {
+  def pongoBichito(i: Int): Unit = {
     // el papá/la mamá pone un bichito en el plato (0=papá, 1=mamá)
     // ...
     log(s"Papá $i pone un bichito. Quedan $plato bichitos")
