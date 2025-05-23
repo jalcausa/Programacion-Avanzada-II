@@ -22,7 +22,7 @@ object Barca{
       if (nIPhone == 3 || nIPhone == 1) pEntradaAndroid = false
       else pEntradaIPhone = false
     }
-    if (nIPhone + nIPhone < 4) {
+    if (nIPhone + nAndroid < 4) {
       while (!pSalida) wait()
     } else {
       pEntradaIPhone = false
@@ -51,7 +51,7 @@ object Barca{
       if (nAndroid == 3 || nAndroid == 1) pEntradaIPhone = false
       else pEntradaAndroid = false
     }
-    if (nIPhone + nIPhone < 4) {
+    if (nIPhone + nAndroid < 4) {
       while (!pSalida) wait()
     } else {
       pEntradaIPhone = false
