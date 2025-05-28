@@ -49,10 +49,15 @@ class Coche(C:Int) extends Thread{
   }
 
   override def run = {
-    while (true){
-      esperaLleno
-      Thread.sleep(Random.nextInt(Random.nextInt(500))) //el coche da una vuelta
-      finViaje
+    var fin = false
+    while (!Thread.interrupted() && !fin){
+      try {
+        esperaLleno
+        Thread.sleep(Random.nextInt(Random.nextInt(500))) //el coche da una vuelta
+        finViaje
+      } catch {
+        case e:InterruptedException => fin = true
+      }
     }
   }
 }
@@ -63,9 +68,10 @@ object Ejercicio4 {
     coche.start()
     for (i<-0 until pasajero.length)
       pasajero(i) = thread{
-        while (true)
+  //      while (true)
           Thread.sleep(Random.nextInt(500))
           coche.nuevoPaseo(i)
       }
-      
+    pasajero.foreach(_.join())
+    coche.interrupt()
 }
