@@ -74,4 +74,6 @@ object Ejercicio4 {
       }
     pasajero.foreach(_.join())
     coche.interrupt()
+    coche.join()
+    log("Fin del programa")
 }
