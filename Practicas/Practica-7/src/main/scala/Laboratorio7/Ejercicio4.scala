@@ -15,7 +15,7 @@ class Coche(C:Int) extends Thread{
 
 
   def nuevoPaseo(id:Int)= synchronized {
-    //el pasajero id  quiere dar un paseo en la montaña rusa
+    //el pasajero id quiere dar un paseo en la montaña rusa
     while (!pEntradaAbierta) wait()
     numPas += 1
     log(s"El pasajero $id se sube al coche. Hay $numPas pasajeros.")
@@ -31,6 +31,7 @@ class Coche(C:Int) extends Thread{
     if  (numPas == 0) {
       pSalidaAbierta = false
       pEntradaAbierta = true
+      notifyAll()
     }
   }
 

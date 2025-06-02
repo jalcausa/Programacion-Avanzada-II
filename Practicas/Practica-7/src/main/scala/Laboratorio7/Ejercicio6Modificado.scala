@@ -91,7 +91,6 @@ object Ejercicio6Modificado {
     log(s"Los niños se han ido a casa")
     pastelero.interrupt()
     pastelero.join()
+    log("fin del programa")
   }
-
-
 }
