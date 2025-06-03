@@ -1,76 +1,79 @@
 package Laboratorio7
 
-import java.util.concurrent.locks.ReentrantLock
+import java.util.concurrent.locks.{Condition, ReentrantLock}
 import scala.util.Random
 
-class Buffer(ncons:Int,tam:Int){
+class Buffer2(ncons:Int,tam:Int){
   //ncons-número de consumidores
   //tam-tamaño del buffer
-  private val l = new ReentrantLock()
 
   private val buffer = new Array[Int](tam)
+  private var indexCons = 0
   private var nDatos = 0
 
-  // CS-Consumidor
-  private val indices = Array.fill(ncons)(0)
-  private val datosPendientes = Array.fill(ncons)(0)
-  private val esperaCons = Array.fill(ncons)(l.newCondition())
-  private val vecesLeido = Array.fill(tam)(0)
+  private val l = new ReentrantLock(true)
 
   // CS-Productor
   private var hayEspacio = true
   private val chayEspacio = l.newCondition()
 
+  // CS.Consumidor
+  private var hayDato = false
+  private val chayDato = l.newCondition()
+
+  private val vecesLeido = new Array[Int](tam)
+
   def nuevoDato(dato:Int) = {
+    //el productor pone un nuevo dato
     l.lock()
     try {
-      while (!hayEspacio) chayEspacio.await()
+      if (nDatos % tam == 0) {
+        while (!hayEspacio) chayEspacio.await()
+        hayEspacio = false
+      }
+
       buffer((dato - 1) % tam) = dato
       log(s"Productor almacena $dato: buffer=${buffer.mkString("[", ",", "]")}}")
       nDatos += 1
-      if (nDatos == tam)
-        hayEspacio = false
-      for (i <- 0 until ncons) {
-        datosPendientes(i) += 1
-        if (datosPendientes(i) == 1)
-          esperaCons(i).signal()
-      }
+      hayDato = true
+      chayDato.signalAll()
     } finally {
       l.unlock()
     }
   }
 
   def extraerDato(id:Int):Int =  {
-    var dato = 0
     l.lock()
+    var dato = 0
     try {
-      while (datosPendientes(id) == 0) esperaCons(id).await()
-      dato = buffer(indices(id))
-      vecesLeido(indices(id)) += 1
-      if (vecesLeido(indices(id)) == ncons) {
-        buffer(indices(id)) = 0
-        vecesLeido(indices(id)) = 0
+      while(!hayDato) chayDato.await()
+      dato = buffer(indexCons % tam)
+      vecesLeido(indexCons % tam) += 1
+
+      if (vecesLeido(indexCons % tam) == ncons) {
+        buffer(indexCons % tam) = 0
         nDatos -= 1
+        if (nDatos == 0)
+          hayDato = false
+        vecesLeido(indexCons % tam) = 0
+        indexCons += 1
         hayEspacio = true
         chayEspacio.signal()
       }
-      indices(id) = (indices(id) + 1) % tam
-      datosPendientes(id) -= 1
       log(s"Consumidor $id lee $dato: buffer=${buffer.mkString("[", ",", "]")}")
-      dato
     } finally {
       l.unlock()
     }
+    dato
   }
 }
-
-object Ejercicio1 {
+object Ejercicio1Simple {
 
   def main(args:Array[String]):Unit = {
     val ncons = 4
     val tam = 3
     val nIter = 10
-    val buffer  = new Buffer(ncons,tam)
+    val buffer  = new Buffer2(ncons,tam)
     val consumidor = new Array[Thread](ncons)
     for (i<-consumidor.indices)
       consumidor(i) = thread{
