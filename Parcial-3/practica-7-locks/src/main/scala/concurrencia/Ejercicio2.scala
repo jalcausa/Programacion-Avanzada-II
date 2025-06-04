@@ -1,28 +1,41 @@
 package concurrencia
 
+import java.util.concurrent.locks.ReentrantLock
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
 class Recursos(rec:Int) {
 
-  
+  private val l = new ReentrantLock(true)
+  private val esperaRecursos = l.newCondition()
+
   private var numRec = rec
+
   
   def pidoRecursos(id:Int,num:Int) =  {
     //proceso id solicita num recursos
-      
+    l.lock()
+    try {
       log(s"Proceso $id pide $num recursos.")
-      
-    
+      while (num > numRec)
+        esperaRecursos.await()
+      numRec -= num
       log(s"Proceso $id coge $num recursos. Quedan $numRec")
-      
+    } finally {
+      l.unlock()
+    }
   }
 
   def libRecursos(id:Int,num:Int) =  {
     //proceso id devuelve num recursos
-   
-    log(s"Proceso $id devuelve $num recursos. Quedan $numRec")
-    
+    l.lock()
+    try {
+      numRec += num
+      log(s"Proceso $id devuelve $num recursos. Quedan $numRec")
+      esperaRecursos.signal()
+    } finally {
+      l.unlock()
+    }
   }
 }
 object Ejercicio2 {
