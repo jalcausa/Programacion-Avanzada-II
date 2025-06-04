@@ -1,0 +1,163 @@
+package GUIConWorkerIntermedio
+
+import java.awt.event.{ActionEvent, ActionListener}
+import java.awt.{BorderLayout, FlowLayout, GridLayout}
+import java.beans.{PropertyChangeEvent, PropertyChangeListener}
+import java.util
+import javax.swing.*
+import scala.collection.mutable.ListBuffer
+import scala.concurrent.CancellationException
+
+class Worker(n:Int, panel:Panel) extends SwingWorker[java.util.List[Int],Unit]{
+
+  def esPrimo(n: Int): Boolean = {
+    def loop(div: Int): Boolean = {
+      if (div * div > n) true
+      else if (n % div == 0) false
+      else loop(div + 1)
+    }
+
+    if (n == 1 || n == 2) true
+    else loop(2)
+  }
+
+  def listaPrimos(n: Int): java.util.List[Int] =
+    val lista = new util.ArrayList[Int]()
+
+    def loop(i: Int, pprimo: Int): java.util.List[Int] = {
+      if (i == n || this.isCancelled) lista
+      else {
+        if (esPrimo(pprimo))
+          lista.add(pprimo)
+          loop(i + 1, pprimo + 1)
+        else
+          loop(i, pprimo + 1)
+      }
+    }
+
+    loop(0, 1)
+  override def doInBackground(): util.List[Int] = {
+    listaPrimos(n)
+  }
+
+  override def done(): Unit = {
+    try{
+      panel.listaPrimos(get())
+      panel.nuevoMensaje("Tarea finalizada")
+    } catch{
+      case e:CancellationException => panel.nuevoMensaje("Tarea cancelada")
+    }
+
+  }
+}
+class Controlador(panel:Panel) extends ActionListener {
+
+  private var worker: Worker = null
+
+  override def actionPerformed(e: ActionEvent): Unit = {
+    if (e.getActionCommand.equals("SI")) {
+      panel.nuevoMensaje("Sí pulsado")
+    } else if (e.getActionCommand.equals("NO")) {
+      panel.nuevoMensaje("No pulsado")
+    } else if (e.getActionCommand.equals("CANCELAR")) {
+      if (worker!=null) worker.cancel(true)
+    } else
+    //e.getActionCommand.equals("PRIMOS")
+      try {
+        val n = panel.numero()
+        panel.limpiarArea()
+        // panel.nuevoMensaje("Canculando primos....")
+        //   val lista = listaPrimos(n)
+        //  panel.listaPrimos(lista)
+        // panel.nuevoMensaje("Tarea finalizada")
+        worker = new Worker(n, panel)
+        worker.execute()
+      } catch {
+        case e: NumberFormatException => panel.nuevoMensaje("Número incorrecto")
+      }
+  }
+}
+
+
+
+
+
+
+  class Panel extends JPanel{
+  private val panelNorte = new JPanel()
+  private val etiq = new JLabel("es verdad?")
+  private val bsi = new JButton("Sí")
+  private val bno = new JButton("No")
+  private val etiqPrimos = new JLabel("Primos?:")
+  private val nprimos = new JTextField(5)
+  private val mensaje = new JLabel("GUI creada")
+  private val area = new JTextArea(30,30)
+  private val cancelar = new JButton("Cancelar")
+
+  panelNorte.add(etiq)
+  panelNorte.add(bsi)
+  panelNorte.add(bno)
+  panelNorte.add(etiqPrimos)
+  panelNorte.add(nprimos)
+  panelNorte.add(cancelar)
+
+  private val scrol = new JScrollPane(area)
+  this.setLayout(new BorderLayout())
+  this.add(panelNorte,BorderLayout.NORTH)
+
+  this.add(mensaje,BorderLayout.SOUTH)
+  this.add(scrol,BorderLayout.CENTER)
+
+  def controlador(ctr:ActionListener)={
+    bsi.setActionCommand("SI")
+    bno.setActionCommand("NO")
+    bsi.addActionListener(ctr)
+    bno.addActionListener(ctr)
+    nprimos.setActionCommand("PRIMOS")
+    nprimos.addActionListener(ctr)
+    cancelar.setActionCommand("CANCELAR")
+    cancelar.addActionListener(ctr)
+  }
+
+  def nuevoMensaje(str:String) = {
+    mensaje.setText(str)
+  }
+
+  def numero():Int = {
+    Integer.parseInt(nprimos.getText)
+  }
+
+  def listaPrimos(lista:java.util.List[Int]) ={
+    for (i<-0 until lista.size())
+      area.append(s"${lista.get(i)} ")
+      if ((i+1)%10 == 0) area.append("\n")
+  }
+  def limpiarArea()=
+    area.setText("")
+}
+
+
+object EjemploGui {
+
+  def crearGUI(ventana:JFrame)={
+    val panel = new Panel
+    val ctr = new Controlador(panel)
+    panel.controlador(ctr)
+    ventana.setContentPane(panel)
+    ventana.pack()
+    ventana.setVisible(true)
+    ventana.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
+  }
+
+  def main(args:Array[String]): Unit = {
+    SwingUtilities.invokeLater(
+      new Runnable:
+        override def run(): Unit =
+          val ventana = new JFrame("Ejemplo sencillo")
+          crearGUI(ventana)
+    )
+
+
+  }
+
+}
