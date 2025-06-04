@@ -11,18 +11,11 @@ object Guarderia{
   private var nAdulto = 0
 
   private val l = new ReentrantLock(true)
-
-  private val cAdulto = l.newCondition()
-  private val cBebe = l.newCondition()
-
-
+  
 
   def entraBebe(id:Int) =  {
     l.lock()
     try {
-     while (nBebe + 1 > 3 * nAdulto)
-       cBebe.await()
-     nBebe += 1
      log(s"Ha llegado un bebé. Bebés=$nBebe, Adultos=$nAdulto")
    } finally {
      l.unlock()
@@ -31,12 +24,7 @@ object Guarderia{
   def saleBebe(id:Int) =  {
     l.lock()
     try{
-      nBebe -= 1
       log(s"Ha salido un bebé. Bebés=$nBebe, Adultos=$nAdulto")
-      // Se puede afinar más para solo despertar un adulto en caso necesario
-      // solo si al irse el bebé ahora puede salir
-      if (nBebe <= 3 * (nAdulto - 1))
-        cAdulto.signal()
     } finally {
       l.unlock()
     }
@@ -44,10 +32,7 @@ object Guarderia{
   def entraAdulto(id:Int) =  {
     l.lock()
     try {
-      nAdulto += 1
       log(s"Ha llegado un adulto. Bebés=$nBebe, Adultos=$nAdulto")
-      cBebe.signalAll()
-      cAdulto.signal() // Al llegar un nuevo adulto puede que otro pueda irse
     } finally {
       l.unlock()
     }
@@ -56,9 +41,6 @@ object Guarderia{
   def saleAdulto(id:Int) =  {
     l.lock()
     try {
-      while (nBebe > 3 * (nAdulto - 1))
-        cAdulto.await()
-      nAdulto -= 1
       log(s"Ha salido un adulto. Bebés=$nBebe, Adultos=$nAdulto")
     } finally {
       l.unlock()

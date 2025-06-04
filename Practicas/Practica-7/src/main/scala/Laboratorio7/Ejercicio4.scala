@@ -69,7 +69,6 @@ object Ejercicio4 {
     coche.start()
     for (i<-0 until pasajero.length)
       pasajero(i) = thread{
-  //      while (true)
           Thread.sleep(Random.nextInt(500))
           coche.nuevoPaseo(i)
       }
