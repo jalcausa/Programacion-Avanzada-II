@@ -24,7 +24,8 @@ object Barca{
     }
     if (nIPhone + nAndroid < 4) {
       while (!pSalida) wait()
-    } else {
+    } 
+    else {
       pEntradaIPhone = false
       pEntradaAndroid = false
       log(s"Empieza el viaje....")
