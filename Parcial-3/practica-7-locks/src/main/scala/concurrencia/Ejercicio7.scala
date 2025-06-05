@@ -11,12 +11,18 @@ object Guarderia{
   private var nAdulto = 0
 
   private val l = new ReentrantLock(true)
+
+  private val esperaAdultos = l.newCondition()
+  private val esperaBebes = l.newCondition()
   
 
   def entraBebe(id:Int) =  {
     l.lock()
     try {
-     log(s"Ha llegado un bebé. Bebés=$nBebe, Adultos=$nAdulto")
+      while ((nBebe + 1) > 3*nAdulto) esperaBebes.await()
+      nBebe += 1
+      assert(nBebe <= 3 * nAdulto)
+      log(s"Ha llegado un bebé. Bebés=$nBebe, Adultos=$nAdulto")
    } finally {
      l.unlock()
    }
@@ -24,6 +30,9 @@ object Guarderia{
   def saleBebe(id:Int) =  {
     l.lock()
     try{
+      nBebe -= 1
+      assert(nBebe <= 3 * nAdulto)
+      if (nBebe <= 3*(nAdulto - 1)) esperaAdultos.signal()
       log(s"Ha salido un bebé. Bebés=$nBebe, Adultos=$nAdulto")
     } finally {
       l.unlock()
@@ -32,6 +41,10 @@ object Guarderia{
   def entraAdulto(id:Int) =  {
     l.lock()
     try {
+      nAdulto += 1
+      assert(nBebe <= 3 * nAdulto)
+      esperaAdultos.signal()
+      esperaBebes.signalAll()
       log(s"Ha llegado un adulto. Bebés=$nBebe, Adultos=$nAdulto")
     } finally {
       l.unlock()
@@ -41,6 +54,9 @@ object Guarderia{
   def saleAdulto(id:Int) =  {
     l.lock()
     try {
+      while (nBebe > 3*(nAdulto - 1)) esperaAdultos.await()
+      nAdulto -= 1
+      assert(nBebe <= 3 * nAdulto)
       log(s"Ha salido un adulto. Bebés=$nBebe, Adultos=$nAdulto")
     } finally {
       l.unlock()
