@@ -1,4 +1,4 @@
-package object concurrencia {
+package object sushi {
 
  def thread(body: =>Unit):Thread = {
    val t = new Thread {
