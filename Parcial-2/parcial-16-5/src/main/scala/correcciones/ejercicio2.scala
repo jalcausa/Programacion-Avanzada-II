@@ -1,8 +1,8 @@
-package PAII_IS_A1
+package correcciones
 
 import java.util.concurrent.Semaphore
 import scala.util.Random
-class Salon(cap:Int){
+class Salon2(cap:Int){
 
   /*
    * Condiciones sincronización del ejercicio 1
@@ -71,13 +71,13 @@ class Salon(cap:Int){
     puertaEntrada.release()
   }
 }
-object ejemResidencia {
+object ejemResidencia2 {
 
   def main(args:Array[String]):Unit={
     val R = 20
     val Cap = 5
     val F = 1
-    val salon = new Salon(Cap)
+    val salon = new Salon2(Cap)
     val estudiante = new Array[Thread](R)
     for (i<-estudiante.indices)
       estudiante(i) = thread{

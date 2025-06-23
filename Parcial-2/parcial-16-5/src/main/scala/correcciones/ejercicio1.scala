@@ -1,4 +1,4 @@
-package PAII_IS_A1
+package correcciones
 
 import java.util.concurrent.Semaphore
 import scala.util.Random
@@ -65,13 +65,13 @@ class Salon(cap:Int){
     superadoAforo = 0
     puertaEntrada.release()
     log(s"Decano: me voy otra vez a dormir")
-    esperaDecano.acquire()
+    // esperaDecano.acquire() // sobra creoº
   }
 }
 object ejemResidencia {
 
   def main(args:Array[String]):Unit={
-    val R = 20
+    val R = 100
     val Cap = 5
     val F = 1
     val salon = new Salon(Cap)

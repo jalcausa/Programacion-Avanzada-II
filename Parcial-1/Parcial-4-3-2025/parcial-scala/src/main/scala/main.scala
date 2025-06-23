@@ -1,3 +1,5 @@
+import scala.annotation.tailrec
+
 trait ImmutableVector {
   def toList: List[Double]
   def dim: Int
@@ -48,7 +50,7 @@ object  EjerciciosControl {
       case _ => println("no son de la misma dimensión")
     }
 }
-
+v
 def merge[A](lq: (A, A) => Boolean)(l1: List[A], l2: List[A]): List[A] =
   (l1, l2) match
     case (Nil, _) => l2
